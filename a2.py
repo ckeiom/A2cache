@@ -1,12 +1,13 @@
 import numpy as np
 import math
+import sys
 from numpy.linalg import inv
 
+np.set_printoptions(threshold=np.inf);
 # Train
 data_x = np.loadtxt('x.txt', dtype = int, delimiter=',');
 data_y = np.loadtxt('y.txt', dtype = int);
 prune_size = 9500;
-
 valid_pos = 0;
 
 for i in range(len(data_x[0]) / 2, len(data_x)):
@@ -17,7 +18,7 @@ for i in range(len(data_x[0]) / 2, len(data_x)):
 		valid_pos = i;
 		break;
 
-train_x = np.zeros((len(data_x) - valid_pos - prune_size, 2), dtype = int);
+train_x = np.zeros((len(data_x) / 2 - valid_pos, 2), dtype = float);
 
 for i in range(len(train_x)):
 	train_x[i, 0] = data_x[valid_pos + i, data_y[valid_pos + i] * 2];
@@ -25,14 +26,22 @@ for i in range(len(train_x)):
 
 mu = np.mean(train_x, axis = 0);
 sigma = np.cov(train_x, rowvar = 0, bias = 1);
+epsilon = 0.001;
 
+if(sigma[0, 0] == 0):
+	sigma[0, 0] = epsilon;
+if(sigma[1, 1] == 0):
+	sigma[1, 1] = epsilon;
 print(valid_pos);
-print(train_x);
+#print(train_x);
 print(mu);
+print(sigma);
+#print(train_x);
+#print(sigma);
 # Test
 
 num_bucket = 100;
-crude_data = np.loadtxt('test.txt', dtype = int);
+crude_data = np.loadtxt(sys.argv[1], dtype = int);
 candidate = np.zeros((len(crude_data)), dtype = int);
 output = np.zeros((len(crude_data), num_bucket, 2), dtype = int);
 cache = [0] * num_bucket;
@@ -84,5 +93,7 @@ for i in range(len(crude_data)):
 		candidate[i] = cache.index(0);
 	else:
 		candidate[i] = np.argmax(distance);
+print("\nA2");
 print("Miss: " + str(num_eviction));
 print("Cold Miss: " + str(num_bucket));
+np.savetxt('trainx.txt', train_x, fmt = '%d', delimiter = ',');

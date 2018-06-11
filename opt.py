@@ -1,8 +1,9 @@
 import tensorflow as tf
 import numpy as np
+import sys
 
 num_bucket = 100;
-crude_data = np.loadtxt('test.txt', dtype = int);
+crude_data = np.loadtxt(sys.argv[1], dtype = int);
 output = np.zeros((len(crude_data), num_bucket, 2), dtype = int);
 candidate = np.zeros((len(crude_data)), dtype = int);
 cache = [0] * num_bucket;
@@ -56,5 +57,6 @@ for i in range(len(crude_data)):
 
 np.savetxt('x.txt', output.reshape(len(crude_data), num_bucket * 2), delimiter = ',', fmt = '%d');
 np.savetxt('y.txt', candidate, fmt = '%d', delimiter = ',');
+print("\nOPT");
 print("Miss: " + str(num_eviction));
 print("Cold Miss: " + str(num_bucket));
